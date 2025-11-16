@@ -11,7 +11,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     show-sql: true
     properties:
       hibernate:
@@ -30,6 +30,23 @@ spring:
       host: localhost
       port: 6379
       timeout: 60000
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    deserialization:
+      adjust-dates-to-context-time-zone: false
+
+
+  batch:
+    datasource:
+      url: jdbc:postgresql://localhost:5432/jobseekdb
+      username: jobseekuser
+      password: jobseekpass
+      driver-class-name: org.postgresql.Driver
+    jdbc:
+      initialize-schema: always
+      table-prefix: BATCH_
+
 
 
 server:
@@ -41,3 +58,4 @@ logging:
     root: INFO
     com.ft.searchengine: DEBUG
     org.springframework.data.elasticsearch: DEBUG
+    org.springframework.batch: DEBUG
