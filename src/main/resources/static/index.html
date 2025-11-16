@@ -359,7 +359,7 @@
             : '<span style="color: #999;">No skills listed</span>';
 
         html += `
-            <div class="job-card">
+            <div class="job-card" onclick="openJob('${job.jobUrl}', '${job.id}')" style="cursor: pointer;">
                 <div class="job-title">${title}</div>
                 <div class="job-company">${company}</div>
                 <div class="job-details">
@@ -374,6 +374,16 @@
 
     resultsDiv.innerHTML = html;
 }
+
+    function openJob(jobUrl, jobId) {
+            if (jobUrl && jobUrl !== 'null' && jobUrl !== 'undefined') {
+                // Open the real job URL in a new tab
+                window.open(jobUrl, '_blank');
+            } else {
+                // Fallback to internal job detail page if no URL
+                alert('Job URL not available. Job ID: ' + jobId);
+            }
+        }
 </script>
 </body>
 </html>

@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Import Jobs - JobSeek Pro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .card {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 10px;
+            padding: 60px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+        }
+
+        .upload-area:hover {
+            background: #f8f9ff;
+            border-color: #5568d3;
+        }
+
+        .upload-area.dragover {
+            background: #f0f0ff;
+            border-color: #5568d3;
+        }
+
+        .upload-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+        }
+
+        .button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .result.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .result.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .progress {
+            margin-top: 20px;
+            display: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .links {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .links a {
+            color: #667eea;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: 600;
+        }
+
+        .links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>📤 Import Jobs Data</h1>
+        <p>Upload a CSV file to import job listings</p>
+    </div>
+
+    <div class="card">
+        <form id="uploadForm">
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">📁</div>
+                <h3>Click to select file or drag and drop</h3>
+                <p>CSV files only</p>
+                <input type="file" id="fileInput" accept=".csv">
+            </div>
+
+            <div id="fileName" style="margin-bottom: 20px; text-align: center; color: #666;"></div>
+
+            <button type="submit" class="button" id="uploadButton" disabled>
+                Upload and Import
+            </button>
+        </form>
+
+        <div class="progress" id="progress">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill">0%</div>
+            </div>
+        </div>
+
+        <div class="result" id="result"></div>
+
+        <div class="links">
+            <a href="/">🔍 Search Jobs</a>
+            <a href="/admin.html">⚙️ Admin Panel</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('fileInput');
+    const uploadButton = document.getElementById('uploadButton');
+    const fileName = document.getElementById('fileName');
+    const uploadForm = document.getElementById('uploadForm');
+    const progress = document.getElementById('progress');
+    const progressFill = document.getElementById('progressFill');
+    const result = document.getElementById('result');
+
+    // Click to upload
+    uploadArea.addEventListener('click', () => fileInput.click());
+
+    // File selected
+    fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            fileName.textContent = `Selected: ${file.name}`;
+            uploadButton.disabled = false;
+        }
+    });
+
+    // Drag and drop
+    uploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadArea.classList.add('dragover');
+    });
+
+    uploadArea.addEventListener('dragleave', () => {
+        uploadArea.classList.remove('dragover');
+    });
+
+    uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadArea.classList.remove('dragover');
+
+        const file = e.dataTransfer.files[0];
+        if (file && file.name.endsWith('.csv')) {
+            fileInput.files = e.dataTransfer.files;
+            fileName.textContent = `Selected: ${file.name}`;
+            uploadButton.disabled = false;
+        } else {
+            alert('Please drop a CSV file');
+        }
+    });
+
+    // Upload form
+    uploadForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const file = fileInput.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        uploadButton.disabled = true;
+        progress.style.display = 'block';
+        result.style.display = 'none';
+        progressFill.style.width = '50%';
+        progressFill.textContent = 'Uploading...';
+
+        try {
+            const response = await fetch('/api/import/csv', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            progressFill.style.width = '100%';
+            progressFill.textContent = 'Complete!';
+
+            setTimeout(() => {
+                progress.style.display = 'none';
+                result.style.display = 'block';
+
+                if (data.successCount > 0) {
+                    result.className = 'result success';
+                    result.innerHTML = `
+                        <h3>✅ Import Successful!</h3>
+                        <p><strong>${data.successCount}</strong> jobs imported successfully</p>
+                        ${data.errorCount > 0 ? `<p>${data.errorCount} rows had errors</p>` : ''}
+                        <p style="margin-top: 15px;">
+                            <strong>Next step:</strong> Go to
+                            <a href="/admin.html" style="color: #667eea;">Admin Panel</a>
+                            and click "Sync Now" to push data to Elasticsearch
+                        </p>
+                    `;
+                } else {
+                    result.className = 'result error';
+                    result.innerHTML = `
+                        <h3>❌ Import Failed</h3>
+                        <p>No jobs were imported. Please check your CSV format.</p>
+                    `;
+                }
+
+                uploadButton.disabled = false;
+            }, 1000);
+
+        } catch (error) {
+            progress.style.display = 'none';
+            result.style.display = 'block';
+            result.className = 'result error';
+            result.innerHTML = `
+                <h3>❌ Upload Failed</h3>
+                <p>${error.message}</p>
+            `;
+            uploadButton.disabled = false;
+        }
+    });
+</script>
+</body>
+</html>

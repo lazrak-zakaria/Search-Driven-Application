@@ -49,6 +49,8 @@ public class Job {
     @Column(nullable = false)
     private Boolean isActive = true;
 
+    @Column(length = 1024)
+    private String jobUrl;
     @PrePersist
     protected void onCreate() {
         if (postedDate == null) {

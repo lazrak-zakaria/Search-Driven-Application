@@ -60,7 +60,7 @@ public class JobSyncBatchConfig {
             doc.setExperienceLevel(job.getExperienceLevel());
             doc.setPostedDate(job.getPostedDate());
             doc.setIsActive(job.getIsActive());
-
+            doc.setJobUrl(job.getJobUrl());
             return doc;
         };
     }

@@ -55,4 +55,8 @@ public class JobDocument implements Serializable {
 
     @Field(type = FieldType.Boolean)
     private Boolean isActive;
+
+    @Field(type = FieldType.Keyword)
+    private String jobUrl;
+
 }
