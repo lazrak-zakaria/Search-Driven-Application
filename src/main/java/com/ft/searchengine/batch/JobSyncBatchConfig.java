@@ -31,7 +31,7 @@ public class JobSyncBatchConfig {
     @Autowired
     private JobSearchRepository jobSearchRepository;
 
-    // Step 1: Read jobs from PostgreSQL
+
     @Bean
     public JpaPagingItemReader<Job> jobReader() {
         return new JpaPagingItemReaderBuilder<Job>()
@@ -42,7 +42,7 @@ public class JobSyncBatchConfig {
                 .build();
     }
 
-    // Step 2: Process (convert Job to JobDocument)
+
     @Bean
     public ItemProcessor<Job, JobDocument> jobProcessor() {
         return job -> {
@@ -65,7 +65,7 @@ public class JobSyncBatchConfig {
         };
     }
 
-    // Step 3: Write to Elasticsearch
+
     @Bean
     public ItemWriter<JobDocument> jobWriter() {
         return items -> {
@@ -74,7 +74,7 @@ public class JobSyncBatchConfig {
         };
     }
 
-    // Define the Step
+
     @Bean
     public Step syncJobsStep(JobRepository jobRepository,
                              PlatformTransactionManager transactionManager) {

@@ -30,9 +30,11 @@ public class JobSearchController {
             @RequestParam(defaultValue = "postedDate") String sortBy,
             @RequestParam(defaultValue = "desc") String sortOrder
     ) {
-        log.info("📨 Received search request: keyword={}, location={}", keyword, location);
+        log.info("Received search request: keyword={}, location={}", keyword, location);
 
         JobSearchRequest request = new JobSearchRequest();
+        if (keyword == null) keyword = "";
+
         request.setKeyword(keyword);
         request.setLocation(location);
         request.setMinSalary(minSalary);
@@ -52,6 +54,6 @@ public class JobSearchController {
     @PostMapping("/clear-cache")
     public ResponseEntity<String> clearCache() {
         jobSearchService.clearCache();
-        return ResponseEntity.ok("✅ Cache cleared successfully!");
+        return ResponseEntity.ok("Cache cleared successfully!");
     }
 }

@@ -27,7 +27,7 @@ public class JobSearchService {
     @Autowired
     private ElasticsearchOperations elasticsearchOperations;
 
-    @Cacheable(value = "jobSearch", key = "#request.toString()")
+//    @Cacheable(value = "jobSearch", key = "#request.toString()")
     public JobSearchResponse searchJobs(JobSearchRequest request) {
         long startTime = System.currentTimeMillis();
 

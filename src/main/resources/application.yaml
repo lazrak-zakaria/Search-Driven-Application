@@ -30,11 +30,11 @@ spring:
       host: localhost
       port: 6379
       timeout: 60000
-  jackson:
-    serialization:
-      write-dates-as-timestamps: false
-    deserialization:
-      adjust-dates-to-context-time-zone: false
+#  jackson:
+#    serialization:
+#      write-dates-as-timestamps: false
+#    deserialization:
+#      adjust-dates-to-context-time-zone: false
 
 
   batch:

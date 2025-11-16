@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JobSeek Pro - Job Search</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .search-box {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+        }
+
+        .search-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .search-button {
+            grid-column: span 2;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .search-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .search-button:active {
+            transform: translateY(0);
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .results {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .job-card {
+            border: 2px solid #e0e0e0;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+
+        .job-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .job-title {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .job-company {
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .job-details {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .job-detail {
+            display: flex;
+            align-items: center;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .job-detail::before {
+            content: "•";
+            margin-right: 5px;
+            color: #667eea;
+        }
+
+        .skills {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .skill-tag {
+            background: #667eea;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+
+        .no-results {
+            text-align: center;
+            color: #666;
+            padding: 40px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+        }
+
+        @media (max-width: 768px) {
+            .search-form {
+                grid-template-columns: 1fr;
+            }
+
+            .search-button {
+                grid-column: span 1;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>🔍 JobSeek Pro</h1>
+        <p>Find your dream job with advanced search</p>
+    </div>
+
+    <div class="search-box">
+        <form id="searchForm" class="search-form">
+            <div class="form-group">
+                <label for="keyword">Keyword</label>
+                <input type="text" id="keyword" placeholder="e.g., Java Developer">
+            </div>
+
+            <div class="form-group">
+                <label for="location">Location</label>
+                <input type="text" id="location" placeholder="e.g., San Francisco, CA">
+            </div>
+
+            <div class="form-group">
+                <label for="minSalary">Min Salary</label>
+                <input type="number" id="minSalary" placeholder="e.g., 80000">
+            </div>
+
+            <div class="form-group">
+                <label for="maxSalary">Max Salary</label>
+                <input type="number" id="maxSalary" placeholder="e.g., 150000">
+            </div>
+
+            <div class="form-group">
+                <label for="experienceLevel">Experience Level</label>
+                <select id="experienceLevel">
+                    <option value="">All Levels</option>
+                    <option value="Entry">Entry</option>
+                    <option value="Mid">Mid</option>
+                    <option value="Senior">Senior</option>
+                    <option value="Lead">Lead</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="pageSize">Results per page</label>
+                <select id="pageSize">
+                    <option value="10">10</option>
+                    <option value="20" selected>20</option>
+                    <option value="50">50</option>
+                </select>
+            </div>
+
+            <button type="submit" class="search-button">🔍 Search Jobs</button>
+        </form>
+    </div>
+
+    <div class="stats" id="stats" style="display: none;">
+        <div class="stat-item">
+            <div class="stat-value" id="totalResults">0</div>
+            <div class="stat-label">Results Found</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value" id="searchTime">0ms</div>
+            <div class="stat-label">Search Time</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value" id="currentPage">1</div>
+            <div class="stat-label">Current Page</div>
+        </div>
+    </div>
+
+    <div class="results" id="results">
+        <div class="no-results">
+            Enter your search criteria and click "Search Jobs" to get started
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('searchForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const keyword = document.getElementById('keyword').value;
+        const location = document.getElementById('location').value;
+        const minSalary = document.getElementById('minSalary').value;
+        const maxSalary = document.getElementById('maxSalary').value;
+        const experienceLevel = document.getElementById('experienceLevel').value;
+        const pageSize = document.getElementById('pageSize').value;
+
+        // Build query string
+        const params = new URLSearchParams();
+        if (keyword) params.append('keyword', keyword);
+        if (location) params.append('location', location);
+        if (minSalary) params.append('minSalary', minSalary);
+        if (maxSalary) params.append('maxSalary', maxSalary);
+        if (experienceLevel) params.append('experienceLevel', experienceLevel);
+        params.append('size', pageSize);
+
+        // Show loading
+        document.getElementById('results').innerHTML = '<div class="loading">⏳ Searching...</div>';
+
+        try {
+            const response = await fetch(`/api/jobs/search?${params.toString()}`);
+            const data = await response.json();
+
+            displayResults(data);
+        } catch (error) {
+            document.getElementById('results').innerHTML =
+                '<div class="no-results">❌ Error: ' + error.message + '</div>';
+        }
+    });
+
+    function displayResults(data) {
+    console.log('Received data:', data); // Debug log
+
+    // Update stats
+    document.getElementById('stats').style.display = 'flex';
+    document.getElementById('totalResults').textContent = data.totalResults || 0;
+    document.getElementById('searchTime').textContent = (data.searchTimeMs || 0) + 'ms';
+    document.getElementById('currentPage').textContent = (data.currentPage || 0) + 1;
+
+    const resultsDiv = document.getElementById('results');
+
+    if (!data.results || data.results.length === 0) {
+        resultsDiv.innerHTML = '<div class="no-results">No jobs found. Try adjusting your search criteria.</div>';
+        return;
+    }
+
+    let html = '';
+    data.results.forEach(job => {
+        // Defensive checks
+        const title = job.title || 'Untitled Position';
+        const company = job.company || 'Unknown Company';
+        const location = job.location || 'Location not specified';
+        const experienceLevel = job.experienceLevel || 'Any level';
+
+        const salary = job.minSalary && job.maxSalary
+            ? `$${job.minSalary.toLocaleString()} - $${job.maxSalary.toLocaleString()}`
+            : 'Salary not specified';
+
+        const skillsHtml = job.skills && job.skills.length > 0
+            ? job.skills.map(skill => `<span class="skill-tag">${skill}</span>`).join('')
+            : '<span style="color: #999;">No skills listed</span>';
+
+        html += `
+            <div class="job-card">
+                <div class="job-title">${title}</div>
+                <div class="job-company">${company}</div>
+                <div class="job-details">
+                    <div class="job-detail">📍 ${location}</div>
+                    <div class="job-detail">💰 ${salary}</div>
+                    <div class="job-detail">📊 ${experienceLevel}</div>
+                </div>
+                <div class="skills">${skillsHtml}</div>
+            </div>
+        `;
+    });
+
+    resultsDiv.innerHTML = html;
+}
+</script>
+</body>
+</html>

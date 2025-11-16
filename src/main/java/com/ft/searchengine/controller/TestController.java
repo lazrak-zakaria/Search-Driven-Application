@@ -8,6 +8,7 @@ import com.ft.searchengine.entity.Job;
 import com.ft.searchengine.repository.JobsRepository;
 import com.ft.searchengine.repository.JobSearchRepository;
 import com.ft.searchengine.service.JobSearchService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +19,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/test")
+@Slf4j
 public class TestController {
 
     @Autowired
@@ -40,8 +42,8 @@ public class TestController {
     }
 
     @PostMapping("/create-job")
-    public String createTestJob() {
-
+    public Job createTestJob() {
+        // Only save to PostgreSQL
         Job job = new Job();
         job.setTitle("Senior Java Developer");
         job.setCompany("TechCorp");
@@ -56,23 +58,9 @@ public class TestController {
 
         Job savedJob = jobRepository.save(job);
 
+//        log.info("✅ Job created in PostgreSQL only (ID: {})", savedJob.getId());
 
-        JobDocument jobDoc = new JobDocument();
-        jobDoc.setId(savedJob.getId().toString());
-        jobDoc.setTitle(savedJob.getTitle());
-        jobDoc.setCompany(savedJob.getCompany());
-        jobDoc.setDescription(savedJob.getDescription());
-        jobDoc.setSkills(savedJob.getSkills());
-        jobDoc.setLocation(savedJob.getLocation());
-        jobDoc.setMinSalary(savedJob.getMinSalary());
-        jobDoc.setMaxSalary(savedJob.getMaxSalary());
-        jobDoc.setExperienceLevel(savedJob.getExperienceLevel());
-        jobDoc.setPostedDate(savedJob.getPostedDate());
-        jobDoc.setIsActive(savedJob.getIsActive());
-
-        jobSearchRepository.save(jobDoc);
-
-        return "Job created with ID: " + savedJob.getId() + " (saved in both PostgreSQL and Elasticsearch)";
+        return savedJob;
     }
 
     @GetMapping("/all-jobs")
@@ -127,12 +115,20 @@ public class TestController {
 
     @PostMapping("/create-multiple-jobs")
     public String createMultipleJobs() {
-        String[] titles = {"Java Developer", "Python Developer", "React Developer", "DevOps Engineer"};
-        String[] companies = {"TechCorp", "DataCo", "WebSolutions", "CloudSys"};
-        String[] locations = {"San Francisco, CA", "New York, NY", "Remote", "Austin, TX"};
+        String[] titles = {"Java Developer", "Python Developer", "React Developer", "DevOps Engineer", "Data Scientist"};
+        String[] companies = {"TechCorp", "DataCo", "WebSolutions", "CloudSys", "AI Labs"};
+        String[] locations = {"San Francisco, CA", "New York, NY", "Remote", "Austin, TX", "Seattle, WA"};
+        String[][] skills = {
+                {"Java", "Spring Boot", "Microservices"},
+                {"Python", "Django", "FastAPI"},
+                {"React", "JavaScript", "TypeScript"},
+                {"Docker", "Kubernetes", "AWS"},
+                {"Python", "TensorFlow", "Machine Learning"}
+        };
 
+        int count = 0;
         for (int i = 0; i < titles.length; i++) {
-            // Save to PostgreSQL
+            // Save to PostgreSQL ONLY
             Job job = new Job();
             job.setTitle(titles[i]);
             job.setCompany(companies[i]);
@@ -140,30 +136,17 @@ public class TestController {
             job.setLocation(locations[i]);
             job.setMinSalary(80000 + (i * 10000));
             job.setMaxSalary(120000 + (i * 20000));
-            job.setSkills(Arrays.asList("Skill1", "Skill2"));
+            job.setSkills(Arrays.asList(skills[i]));
             job.setExperienceLevel("Mid");
             job.setPostedDate(LocalDateTime.now());
             job.setIsActive(true);
 
-            Job savedJob = jobRepository.save(job);
-
-            // Save to Elasticsearch
-            JobDocument jobDoc = new JobDocument();
-            jobDoc.setId(savedJob.getId().toString());
-            jobDoc.setTitle(savedJob.getTitle());
-            jobDoc.setCompany(savedJob.getCompany());
-            jobDoc.setDescription(savedJob.getDescription());
-            jobDoc.setSkills(savedJob.getSkills());
-            jobDoc.setLocation(savedJob.getLocation());
-            jobDoc.setMinSalary(savedJob.getMinSalary());
-            jobDoc.setMaxSalary(savedJob.getMaxSalary());
-            jobDoc.setExperienceLevel(savedJob.getExperienceLevel());
-            jobDoc.setPostedDate(savedJob.getPostedDate());
-            jobDoc.setIsActive(savedJob.getIsActive());
-
-            jobSearchRepository.save(jobDoc);
+            jobRepository.save(job);
+            count++;
         }
 
-        return "Created " + titles.length + " jobs!";
+        log.info("✅ Created {} jobs in PostgreSQL only", count);
+
+        return "✅ Created " + count + " jobs in PostgreSQL only (not synced to Elasticsearch yet)";
     }
 }
