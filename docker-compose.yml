@@ -1,0 +1,49 @@
+
+services:
+  postgresql:
+    image: postgres:18
+    container_name: jobseek-postgres
+    environment:
+      POSTGRES_DB: jobseekdb
+      POSTGRES_USER: jobseekuser
+      POSTGRES_PASSWORD: jobseekpass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    networks:
+      - jobseek-network
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    container_name: jobseek-elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    networks:
+      - jobseek-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: jobseek-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - jobseek-network
+
+volumes:
+  postgres_data:
+  elasticsearch_data:
+  redis_data:
+
+networks:
+  jobseek-network:
+    driver: bridge
