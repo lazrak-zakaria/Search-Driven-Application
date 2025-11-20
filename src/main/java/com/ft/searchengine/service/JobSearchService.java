@@ -31,8 +31,8 @@ public class JobSearchService {
     public JobSearchResponse searchJobs(JobSearchRequest request) {
         long startTime = System.currentTimeMillis();
 
-        log.info("🔍 Searching with params: {}", request);
-        log.info("⚠️ CACHE MISS - Querying Elasticsearch");
+        log.info("Searching with params: {}", request);
+        log.info("CACHE MISS - Querying Elasticsearch"); //on the first request
 
         // Build query
         Query query = buildQuery(request);
@@ -53,7 +53,7 @@ public class JobSearchService {
         int totalPages = (int) Math.ceil((double) totalHits / request.getSize());
         long searchTime = System.currentTimeMillis() - startTime;
 
-        log.info("✅ Found {} results in {}ms", totalHits, searchTime);
+        log.info("Found {} results in {}ms", totalHits, searchTime);
 
         return new JobSearchResponse(
                 results,
@@ -122,6 +122,6 @@ public class JobSearchService {
 
     @CacheEvict(value = "jobSearch", allEntries = true)
     public void clearCache() {
-        log.info("🗑️ All search cache cleared!");
+        log.info("All search cache cleared!");
     }
 }

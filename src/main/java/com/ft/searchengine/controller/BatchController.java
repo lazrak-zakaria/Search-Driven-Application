@@ -36,7 +36,7 @@ public class BatchController {
 
             jobLauncher.run(syncJobsToElasticsearch, params);
 
-            log.info("✅ Batch sync completed successfully!");
+            log.info("Batch sync completed successfully!");
             return ResponseEntity.ok("Sync job started successfully!");
 
         } catch (Exception e) {
@@ -58,12 +58,12 @@ public class BatchController {
     @PostMapping("/sync-now")
     public ResponseEntity<String> syncNow() {
         try {
-            log.info("🔄 Manual sync triggered via API...");
+            log.info("Manual sync triggered via API...");
             jobSyncScheduler.scheduledSync();
-            return ResponseEntity.ok("✅ Manual sync completed!");
+            return ResponseEntity.ok("Manual sync completed!");
         } catch (Exception e) {
             return ResponseEntity.internalServerError()
-                    .body("❌ Manual sync failed: " + e.getMessage());
+                    .body("Manual sync failed: " + e.getMessage());
         }
     }
 }

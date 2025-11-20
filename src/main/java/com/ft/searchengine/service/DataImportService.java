@@ -150,7 +150,6 @@ public class DataImportService {
 
         String skillsDesc = getField(record, "skills_desc");
         if (skillsDesc != null && !skillsDesc.isEmpty()) {
-
             List<String> skills = extractSkills(skillsDesc);
             job.setSkills(skills);
         } else {
@@ -196,19 +195,19 @@ public class DataImportService {
             return skills;
         }
 
-        // Split by common delimiters: comma, semicolon, pipe, newline
+
         String[] parts = skillsDesc.split("[,;|\\n\\r]+");
 
         for (String part : parts) {
             String cleaned = part.trim();
 
-            // Only include if it's a reasonable length for a skill
-            if (!cleaned.isEmpty() && cleaned.length() >= 2 && cleaned.length() <= 50) {
-                // Capitalize first letter
+
+            if (cleaned.length() >= 2 && cleaned.length() <= 50) {
+
                 cleaned = capitalizeFirstLetter(cleaned);
                 skills.add(cleaned);
 
-                // Limit to 15 skills
+
                 if (skills.size() >= 15) break;
             }
         }
@@ -250,7 +249,7 @@ public class DataImportService {
                     String cleaned = part.trim();
 
 
-                    if (!cleaned.isEmpty() && cleaned.length() >= 3 && cleaned.length() <= 50) {
+                    if (cleaned.length() >= 3 && cleaned.length() <= 50) {
                         // Remove common filler words from the start
                         cleaned = cleaned.replaceFirst("^(and|or|the|a|an|in|with|using)\\s+", "");
                         cleaned = capitalizeFirstLetter(cleaned.trim());
@@ -264,7 +263,7 @@ public class DataImportService {
             }
         }
 
-        // If no skills found through indicators, look for common job-related terms
+
         if (skills.isEmpty()) {
             skills = extractCommonJobTerms(description);
         }
@@ -272,7 +271,7 @@ public class DataImportService {
         return skills;
     }
 
-    // Extract common terms from ANY job description
+
     private List<String> extractCommonJobTerms(String description) {
         List<String> terms = new ArrayList<>();
 
@@ -362,7 +361,7 @@ public class DataImportService {
         return terms;
     }
 
-    // Helper method to capitalize first letter
+
     private String capitalizeFirstLetter(String str) {
         if (str == null || str.isEmpty()) {
             return str;
@@ -370,7 +369,7 @@ public class DataImportService {
         return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
 
-    // Map experience level from various formats
+
     private String mapExperienceLevel(String level) {
         if (level == null) return "Mid";
 
@@ -389,17 +388,16 @@ public class DataImportService {
         return "Mid"; // Default
     }
 
-    // Parse date from Unix timestamp
+
     private LocalDateTime parseDateFromTimestamp(String timestamp) {
         try {
-            // Try parsing as Unix timestamp (milliseconds)
+
             long millis = Long.parseLong(timestamp);
             return LocalDateTime.ofInstant(
                     java.time.Instant.ofEpochMilli(millis),
                     java.time.ZoneId.systemDefault()
             );
         } catch (NumberFormatException e) {
-            // Try parsing as ISO date
             try {
                 return LocalDateTime.parse(timestamp, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
             } catch (Exception e2) {
